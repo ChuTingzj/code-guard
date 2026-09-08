@@ -1,0 +1,162 @@
+// prisma/schema.prisma
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+enum UserRole {
+  ADMIN
+  TECH_LEAD
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         UserRole @default(TECH_LEAD)
+  createdAt    DateTime @default(now())
+
+  documents GuidelineDocument[]
+}
+
+enum GitPlatform {
+  GITHUB
+  GITLAB
+}
+
+model Project {
+  id            String      @id @default(uuid())
+  name          String
+  platform      GitPlatform
+  repoFullName  String
+  webhookSecret String
+  accessToken   String
+  enabled       Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+
+  documents GuidelineDocument[]
+  tasks     ReviewTask[]
+
+  @@unique([platform, repoFullName])
+}
+
+enum DocumentStatus {
+  PROCESSING
+  READY
+  FAILED
+}
+
+model GuidelineDocument {
+  id         String         @id @default(uuid())
+  projectId  String
+  uploaderId String
+  fileName   String
+  fileType   String
+  status     DocumentStatus @default(PROCESSING)
+  error      String?
+  createdAt  DateTime       @default(now())
+
+  project  Project          @relation(fields: [projectId], references: [id])
+  uploader User             @relation(fields: [uploaderId], references: [id])
+  chunks   GuidelineChunk[]
+}
+
+model GuidelineChunk {
+  id         String                       @id @default(uuid())
+  documentId String
+  title      String
+  content    String
+  chunkIndex Int
+  embedding  Unsupported("vector(1536)")?
+  createdAt  DateTime                     @default(now())
+
+  document GuidelineDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+}
+
+enum TaskStatus {
+  QUEUED
+  ANALYZING
+  COMPLETED
+  FAILED
+}
+
+model ReviewTask {
+  id        String     @id @default(uuid())
+  projectId String
+  prNumber  Int
+  prTitle   String?
+  prAuthor  String?
+  headSha   String
+  status    TaskStatus @default(QUEUED)
+  error     String?
+  createdAt DateTime   @default(now())
+  startedAt DateTime?
+  endedAt   DateTime?
+
+  project Project       @relation(fields: [projectId], references: [id])
+  record  ReviewRecord?
+
+  @@unique([projectId, prNumber, headSha])
+  @@index([projectId, createdAt])
+}
+
+enum Verdict {
+  PASSED
+  WARNING
+  REJECTED
+}
+
+model ReviewRecord {
+  id            String   @id @default(uuid())
+  taskId        String   @unique
+  verdict       Verdict
+  finalMarkdown String
+  tokenUsage    Json
+  durationMs    Int
+  createdAt     DateTime @default(now())
+
+  task   ReviewTask    @relation(fields: [taskId], references: [id])
+  issues ReviewIssue[]
+
+  @@index([verdict, createdAt])
+}
+
+enum IssueCategory {
+  STYLE
+  SECURITY
+  ARCHITECTURE
+}
+
+enum IssueSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+model ReviewIssue {
+  id          String        @id @default(uuid())
+  recordId    String
+  category    IssueCategory
+  severity    IssueSeverity
+  filePath    String
+  line        Int?
+  ruleTitle   String?
+  description String
+  suggestion  String?
+  patch       String?
+  createdAt   DateTime      @default(now())
+
+  record ReviewRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+
+  @@index([ruleTitle])
+  @@index([category, severity, createdAt])
+}
