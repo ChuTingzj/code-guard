@@ -10,7 +10,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "prisma:migrate:dev": "prisma migrate dev",
-    "prisma:seed": "ts-node --transpile-only prisma/seed.ts",
+    "prisma:seed": "prisma db seed",
     "test:unit": "ts-node --transpile-only src/modules/review-engine/review-engine.spec.ts"
   },
   "dependencies": {

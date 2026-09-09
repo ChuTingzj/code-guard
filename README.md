@@ -14,13 +14,15 @@
 
 ```bash
 cp .env.example .env
-pnpm install
+pnpm install          # postinstall 会将根目录 .env 软链到 apps/server、apps/web
 docker compose up -d postgres redis
 pnpm db:generate
 pnpm --filter @code-guard/server prisma:migrate:dev
 # 或已有 migration：pnpm db:migrate
 pnpm db:seed
 ```
+
+环境变量只维护仓库根目录的 `.env`。`pnpm env:link`（以及 `postinstall` / `dev*` / `db:migrate` / `db:seed`）会把它映射到各 workspace，Prisma / Nest / Next 在包目录下运行时即可读取。
 
 默认管理员：`admin@codeguard.local` / `Admin123!`
 
