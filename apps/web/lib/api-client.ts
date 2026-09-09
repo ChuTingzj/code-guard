@@ -6,7 +6,7 @@ const API_BASE =
   'http://localhost:3001/api/v1';
 
 export async function apiGet<T>(path: string, init?: RequestInit): Promise<T> {
-  const token = cookies().get('cg_token')?.value;
+  const token = (await cookies()).get('cg_token')?.value;
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
     headers: {
@@ -14,7 +14,7 @@ export async function apiGet<T>(path: string, init?: RequestInit): Promise<T> {
       Authorization: token ? `Bearer ${token}` : '',
       'Content-Type': 'application/json',
     },
-    next: { revalidate: 60 },
+    cache: 'no-store',
   });
   const json = await res.json();
   if (!res.ok || (json.code !== undefined && json.code !== 0)) {
@@ -27,7 +27,7 @@ export async function apiMutate<T>(
   path: string,
   options: { method?: string; body?: unknown; formData?: FormData } = {},
 ): Promise<T> {
-  const token = cookies().get('cg_token')?.value;
+  const token = (await cookies()).get('cg_token')?.value;
   const headers: Record<string, string> = {
     Authorization: token ? `Bearer ${token}` : '',
   };
