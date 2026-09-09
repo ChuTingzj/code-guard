@@ -9,14 +9,71 @@
   --rejected: #b91c1c;
 }
 
-body {
-  background-image:
-    radial-gradient(circle at 12% 8%, rgba(20, 184, 166, 0.12), transparent 40%),
-    radial-gradient(circle at 88% 0%, rgba(15, 118, 110, 0.08), transparent 35%),
-    linear-gradient(180deg, #eef4f6 0%, #f3f6f8 40%, #e8eef1 100%);
-  background-attachment: fixed;
+@layer base {
+  body {
+    @apply bg-paper text-ink antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
-.verdict-passed { color: var(--passed); }
-.verdict-warning { color: var(--warning); }
-.verdict-rejected { color: var(--rejected); }
+@layer components {
+  .ui-page-title {
+    @apply text-[1.75rem] font-semibold tracking-tight text-ink;
+  }
+
+  .ui-page-subtitle {
+    @apply mt-1 text-sm text-ink-muted;
+  }
+
+  .ui-surface {
+    @apply rounded-card border border-border bg-surface p-5 shadow-card;
+  }
+
+  .ui-input {
+    @apply w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-ink outline-none transition duration-ui focus:ring-2 focus:ring-ring;
+  }
+
+  .ui-btn-primary {
+    @apply cursor-pointer rounded-control bg-brand px-4 py-2 text-sm font-medium text-white transition duration-ui hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .ui-btn-secondary {
+    @apply cursor-pointer rounded-control border border-border bg-surface px-3 py-1.5 text-sm text-ink transition duration-ui hover:bg-paper;
+  }
+
+  .ui-error {
+    @apply rounded-control border-l-4 border-rejected bg-red-50 px-4 py-3 text-sm text-rejected;
+  }
+
+  .ui-table-wrap {
+    @apply overflow-x-auto rounded-card border border-border bg-surface shadow-card;
+  }
+
+  .ui-nav-link {
+    @apply block cursor-pointer rounded-control px-3 py-2 text-sm text-ink-muted transition duration-ui hover:bg-paper hover:text-ink;
+  }
+
+  .ui-nav-link-active {
+    @apply bg-teal-50 text-brand hover:bg-teal-50 hover:text-brand;
+  }
+}
+
+.verdict-passed {
+  @apply font-mono text-sm font-medium text-passed;
+}
+.verdict-warning {
+  @apply font-mono text-sm font-medium text-warning;
+}
+.verdict-rejected {
+  @apply font-mono text-sm font-medium text-rejected;
+}
