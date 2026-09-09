@@ -1,0 +1,21 @@
+{
+  "name": "CodeGuard",
+  "install": "bash scripts/cloud-install.sh",
+  "start": "bash scripts/cloud-start.sh",
+  "terminals": [
+    {
+      "name": "server",
+      "command": "cd /workspace && set -a && . ./.env && set +a && pnpm dev:server",
+      "description": "NestJS gateway + worker API on http://localhost:3001 (health: /api/health, Bull Board: /admin/queues)"
+    },
+    {
+      "name": "web",
+      "command": "cd /workspace && set -a && . ./.env && set +a && pnpm dev:web",
+      "description": "Next.js admin dashboard on http://localhost:3000 (login: admin@codeguard.local / Admin123!)"
+    }
+  ],
+  "ports": [
+    { "name": "web", "port": 3000 },
+    { "name": "api", "port": 3001 }
+  ]
+}
