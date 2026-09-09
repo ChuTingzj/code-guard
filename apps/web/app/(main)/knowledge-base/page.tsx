@@ -65,7 +65,7 @@ export default async function KnowledgeBasePage({
           <input type="hidden" name="projectId" value={projectId} />
           <label className="text-sm">
             <span className="mb-1 block text-ink-muted">上传 Markdown / PDF（≤10MB）</span>
-            <input type="file" name="file" accept=".md,.markdown,.pdf" required className="block text-sm" />
+            <input type="file" name="file" accept=".md,.markdown,.pdf" required className="ui-input block" />
           </label>
           <button type="submit" disabled={!projectId} className="ui-btn-primary">
             上传并向量化
