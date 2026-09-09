@@ -15,7 +15,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <AppNav />
         </div>
       </aside>
-      <main className="min-w-0 flex-1 pb-16 md:pl-0">{children}</main>
+      <main className="min-w-0 flex-1 pb-16">{children}</main>
     </div>
   );
 }

@@ -29,7 +29,6 @@ module.exports = {
         card: '0 1px 2px rgba(15, 23, 42, 0.04)',
       },
       fontFamily: {
-        display: ['"IBM Plex Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         sans: ['"IBM Plex Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
