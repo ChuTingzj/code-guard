@@ -2,11 +2,16 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Gitlab } from '@gitbeaker/rest';
 import { IGitProvider, PrDiffFile } from './git-provider.interface';
 import { inferLanguage, truncateDiffFiles } from './diff.util';
+import {
+  buildGitlabInlinePosition,
+  GitlabDiffRefs,
+} from './gitlab-position.util';
 
 @Injectable()
 export class GitlabProvider implements IGitProvider {
   private readonly logger = new Logger(GitlabProvider.name);
   private readonly api: InstanceType<typeof Gitlab>;
+  private readonly diffRefsCache = new Map<string, GitlabDiffRefs>();
 
   constructor(token: string) {
     this.api = new Gitlab({ token });
@@ -50,19 +55,38 @@ export class GitlabProvider implements IGitProvider {
     opts: { filePath: string; line: number; body: string; commitSha: string },
   ): Promise<void> {
     try {
+      const diffRefs = await this.getDiffRefs(repo, prNumber);
       await this.api.MergeRequestDiscussions.create(repo, prNumber, opts.body, {
-        position: {
-          positionType: 'text',
-          baseSha: opts.commitSha,
-          startSha: opts.commitSha,
-          headSha: opts.commitSha,
-          newPath: opts.filePath,
-          oldPath: opts.filePath,
-          newLine: opts.line,
-        } as never,
+        // gitbeaker types mark newLine as string; GitLab API expects a number.
+        position: buildGitlabInlinePosition(diffRefs, {
+          filePath: opts.filePath,
+          line: opts.line,
+        }) as never,
       });
     } catch (err) {
-      this.logger.warn(`GitLab inline suggestion failed: ${err}`);
+      this.logger.warn(
+        `GitLab inline suggestion failed for ${opts.filePath}:${opts.line}: ${err}`,
+      );
     }
+  }
+
+  private async getDiffRefs(repo: string, prNumber: number): Promise<GitlabDiffRefs> {
+    const cacheKey = `${repo}!${prNumber}`;
+    const cached = this.diffRefsCache.get(cacheKey);
+    if (cached) return cached;
+
+    const mr = await this.api.MergeRequests.show(repo, prNumber);
+    const refs = mr.diff_refs as GitlabDiffRefs | undefined;
+    if (!refs?.base_sha || !refs?.start_sha || !refs?.head_sha) {
+      throw new Error(`MR !${prNumber} is missing diff_refs`);
+    }
+
+    const diffRefs: GitlabDiffRefs = {
+      base_sha: refs.base_sha,
+      start_sha: refs.start_sha,
+      head_sha: refs.head_sha,
+    };
+    this.diffRefsCache.set(cacheKey, diffRefs);
+    return diffRefs;
   }
 }

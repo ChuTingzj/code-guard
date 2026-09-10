@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { IsBoolean, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
@@ -70,7 +71,9 @@ export class ProjectsController {
 
   @Delete(':id')
   @Roles('ADMIN')
-  remove(@Param('id') id: string) {
-    return this.projectsService.remove(id);
+  remove(@Param('id') id: string, @Query('force') force?: string) {
+    return this.projectsService.remove(id, {
+      force: force === 'true' || force === '1',
+    });
   }
 }

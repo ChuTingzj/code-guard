@@ -11,7 +11,7 @@
     "prisma:migrate": "prisma migrate deploy",
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:seed": "prisma db seed",
-    "test:unit": "ts-node --transpile-only src/modules/review-engine/review-engine.spec.ts"
+    "test:unit": "ts-node --transpile-only src/modules/review-engine/review-engine.spec.ts && ts-node --transpile-only src/modules/git-client/gitlab-position.spec.ts"
   },
   "dependencies": {
     "@bull-board/api": "^6.21.3",
