@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
+    "start:tunnel": "cloudflared tunnel --url http://localhost:3001 --protocol http2",
     "postinstall": "node scripts/link-workspace-env.mjs",
     "env:link": "node scripts/link-workspace-env.mjs",
     "dev": "pnpm env:link && pnpm -r --parallel --filter @code-guard/server --filter @code-guard/web run dev",
