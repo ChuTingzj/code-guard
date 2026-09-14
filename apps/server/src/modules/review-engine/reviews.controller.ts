@@ -99,7 +99,7 @@ export class ReviewsController {
       headSha: task.headSha,
     };
 
-    const jobId = `${task.projectId}:${task.prNumber}:${task.headSha}:retry:${Date.now()}`;
+    const jobId = `${task.projectId}-${task.prNumber}-${task.headSha}-retry-${Date.now()}`;
     await this.reviewQueue.add('review', payload, { jobId });
     return { enqueued: true, jobId };
   }

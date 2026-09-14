@@ -11,3 +11,4 @@ apps/server/prisma/*.db
 uploads
 .pnpm-store
 tsconfig.tsbuildinfo
+__pycache__
