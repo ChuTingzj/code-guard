@@ -85,4 +85,4 @@ pnpm e2e:checklist   # 需先启动 server
 
 ## License
 
-Private
+MIT
