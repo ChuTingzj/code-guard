@@ -53,7 +53,7 @@ export class ProjectsService {
       webhookSetupHint:
         project.platform === 'GITHUB'
           ? 'GitHub → Settings → Webhooks → Content type application/json, secret = webhookSecret'
-          : 'GitLab → Settings → Webhooks → use webhookSecret as token',
+          : 'GitLab → Settings → Webhooks → URL = webhookUrl，Secret token = webhookSecret',
     };
   }
 
@@ -76,7 +76,52 @@ export class ProjectsService {
     return this.toPublic(updated);
   }
 
-  async remove(id: string) {
+  async remove(id: string, options: { force?: boolean } = {}) {
+    const project = await this.prisma.project.findUnique({ where: { id } });
+    if (!project) {
+      throw new NotFoundException({ code: 404, data: null, message: 'Project not found' });
+    }
+
+    const [documentCount, taskCount] = await Promise.all([
+      this.prisma.guidelineDocument.count({ where: { projectId: id } }),
+      this.prisma.reviewTask.count({ where: { projectId: id } }),
+    ]);
+    const hasRelated = documentCount > 0 || taskCount > 0;
+
+    if (hasRelated && !options.force) {
+      throw new ConflictException({
+        code: 409,
+        data: { canForce: true },
+        message: '项目下仍有文档或评审任务，无法删除',
+      });
+    }
+
+    if (hasRelated && options.force) {
+      await this.prisma.$transaction(async (tx) => {
+        const tasks = await tx.reviewTask.findMany({
+          where: { projectId: id },
+          select: { id: true },
+        });
+        const taskIds = tasks.map((t) => t.id);
+        if (taskIds.length) {
+          const records = await tx.reviewRecord.findMany({
+            where: { taskId: { in: taskIds } },
+            select: { id: true },
+          });
+          const recordIds = records.map((r) => r.id);
+          if (recordIds.length) {
+            await tx.reviewIssue.deleteMany({ where: { recordId: { in: recordIds } } });
+            await tx.reviewRecord.deleteMany({ where: { id: { in: recordIds } } });
+          }
+          await tx.reviewTask.deleteMany({ where: { projectId: id } });
+        }
+        // GuidelineChunk cascades from GuidelineDocument
+        await tx.guidelineDocument.deleteMany({ where: { projectId: id } });
+        await tx.project.delete({ where: { id } });
+      });
+      return { deleted: true, forced: true };
+    }
+
     await this.prisma.project.delete({ where: { id } });
     return { deleted: true };
   }

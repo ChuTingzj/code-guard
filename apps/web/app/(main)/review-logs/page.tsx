@@ -4,12 +4,13 @@ import { ReviewLogsClient } from '@/components/reviews/review-logs-client';
 export default async function ReviewLogsPage({
   searchParams,
 }: {
-  searchParams: { projectId?: string; verdict?: string; page?: string };
+  searchParams: Promise<{ projectId?: string; verdict?: string; page?: string }>;
 }) {
+  const params = await searchParams;
   const qs = new URLSearchParams();
-  if (searchParams.projectId) qs.set('projectId', searchParams.projectId);
-  if (searchParams.verdict) qs.set('verdict', searchParams.verdict);
-  qs.set('page', searchParams.page ?? '1');
+  if (params.projectId) qs.set('projectId', params.projectId);
+  if (params.verdict) qs.set('verdict', params.verdict);
+  qs.set('page', params.page ?? '1');
   qs.set('pageSize', '20');
 
   const data = await apiGet<{
@@ -29,17 +30,17 @@ export default async function ReviewLogsPage({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-3xl font-bold">审查日志</h1>
-        <p className="mt-1 text-sm text-slate-600">共 {data.total} 条 · 点击行查看详情</p>
+        <h1 className="ui-page-title">审查日志</h1>
+        <p className="ui-page-subtitle">共 {data.total} 条 · 点击行查看详情</p>
       </header>
       <form className="flex flex-wrap gap-2 text-sm">
-        <select name="verdict" defaultValue={searchParams.verdict ?? ''} className="rounded-md border px-3 py-1.5">
+        <select name="verdict" defaultValue={params.verdict ?? ''} className="ui-input w-auto">
           <option value="">全部结论</option>
           <option value="PASSED">PASSED</option>
           <option value="WARNING">WARNING</option>
           <option value="REJECTED">REJECTED</option>
         </select>
-        <button className="rounded-md bg-brand px-3 py-1.5 text-white" formAction="/review-logs">
+        <button className="ui-btn-primary" formAction="/review-logs">
           筛选
         </button>
       </form>

@@ -39,12 +39,12 @@ export function DocumentListPoll({
   }, [projectId, docs]);
 
   return (
-    <ul className="divide-y divide-slate-100">
+    <ul className="divide-y divide-border">
       {docs.map((d) => (
         <li key={d.id} className="flex items-center justify-between gap-3 py-3 text-sm">
           <div>
             <p className="font-medium">{d.fileName}</p>
-            <p className="text-slate-500">
+            <p className="text-ink-muted">
               {d.status}
               {d._count ? ` · ${d._count.chunks} chunks` : ''}
               {d.error ? ` · ${d.error}` : ''}
@@ -53,7 +53,7 @@ export function DocumentListPoll({
           <StatusPill status={d.status} />
         </li>
       ))}
-      {!docs.length ? <li className="py-6 text-center text-slate-400">暂无文档</li> : null}
+      {!docs.length ? <li className="py-6 text-center text-ink-muted">暂无文档</li> : null}
     </ul>
   );
 }
@@ -65,5 +65,5 @@ function StatusPill({ status }: { status: string }) {
       : status === 'FAILED'
         ? 'bg-red-50 text-rejected'
         : 'bg-amber-50 text-warning';
-  return <span className={`rounded-full px-2 py-0.5 text-xs ${cls}`}>{status}</span>;
+  return <span className={`rounded-control px-2 py-0.5 text-xs ${cls}`}>{status}</span>;
 }

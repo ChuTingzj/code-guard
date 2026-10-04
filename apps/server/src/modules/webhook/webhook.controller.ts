@@ -106,7 +106,7 @@ export class WebhookController {
     prTitle?: string;
     prAuthor?: string;
   }) {
-    const jobId = `${input.projectId}:${input.prNumber}:${input.headSha}`;
+    const jobId = `${input.projectId}-${input.prNumber}-${input.headSha}`;
 
     let task = await this.prisma.reviewTask.findUnique({
       where: {

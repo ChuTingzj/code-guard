@@ -54,7 +54,7 @@ export class KnowledgeService {
       contentBase64: input.buffer.toString('base64'),
       replaceDocumentIds: existing.map((e) => e.id),
     };
-    await this.ingestQueue.add('ingest', payload, { jobId: `ingest:${doc.id}` });
+    await this.ingestQueue.add('ingest', payload, { jobId: `ingest-${doc.id}` });
     return doc;
   }
 

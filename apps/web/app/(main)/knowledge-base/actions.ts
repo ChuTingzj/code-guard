@@ -10,7 +10,7 @@ export async function uploadDocument(formData: FormData) {
   if (!projectId || !(file instanceof File)) {
     throw new Error('projectId and file required');
   }
-  const token = cookies().get('cg_token')?.value;
+  const token = (await cookies()).get('cg_token')?.value;
   const body = new FormData();
   body.append('file', file);
   const res = await fetch(`${API_BASE}/knowledge/documents?projectId=${projectId}`, {
@@ -27,7 +27,7 @@ export async function uploadDocument(formData: FormData) {
 
 export async function deleteDocument(formData: FormData) {
   const id = String(formData.get('id') ?? '');
-  const token = cookies().get('cg_token')?.value;
+  const token = (await cookies()).get('cg_token')?.value;
   const res = await fetch(`${API_BASE}/knowledge/documents/${id}`, {
     method: 'DELETE',
     headers: { Authorization: token ? `Bearer ${token}` : '' },

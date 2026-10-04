@@ -19,9 +19,9 @@ export function ReviewLogsClient({ items }: { items: Item[] }) {
 
   return (
     <>
-      <div className="overflow-x-auto rounded-xl bg-white/80 shadow-sm ring-1 ring-slate-200/60">
+      <div className="ui-table-wrap">
         <table className="w-full text-left text-sm">
-          <thead className="text-slate-500">
+          <thead className="text-ink-muted">
             <tr>
               <th className="px-4 py-3 font-medium">项目</th>
               <th className="px-4 py-3 font-medium">PR</th>
@@ -34,7 +34,7 @@ export function ReviewLogsClient({ items }: { items: Item[] }) {
             {items.map((item) => (
               <tr
                 key={item.id}
-                className="cursor-pointer border-t border-slate-100 hover:bg-slate-50"
+                className="cursor-pointer border-t border-border transition duration-ui hover:bg-paper"
                 onClick={() => setSelected(item.id)}
               >
                 <td className="px-4 py-3">{item.project?.name ?? '-'}</td>
@@ -51,14 +51,14 @@ export function ReviewLogsClient({ items }: { items: Item[] }) {
                     '-'
                   )}
                 </td>
-                <td className="px-4 py-3 text-slate-500">
+                <td className="px-4 py-3 text-ink-muted">
                   {new Date(item.createdAt).toLocaleString()}
                 </td>
               </tr>
             ))}
             {!items.length ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-400">
+                <td colSpan={5} className="px-4 py-8 text-center text-ink-muted">
                   暂无审查记录
                 </td>
               </tr>

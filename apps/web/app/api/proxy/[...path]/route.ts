@@ -8,10 +8,11 @@ const API_BASE =
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { path: string[] } },
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
-  const token = cookies().get('cg_token')?.value;
-  const path = params.path.join('/');
+  const token = (await cookies()).get('cg_token')?.value;
+  const { path: pathSegments } = await params;
+  const path = pathSegments.join('/');
   const search = _req.nextUrl.search;
   const res = await fetch(`${API_BASE}/${path}${search}`, {
     headers: { Authorization: token ? `Bearer ${token}` : '' },
@@ -23,10 +24,11 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { path: string[] } },
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
-  const token = cookies().get('cg_token')?.value;
-  const path = params.path.join('/');
+  const token = (await cookies()).get('cg_token')?.value;
+  const { path: pathSegments } = await params;
+  const path = pathSegments.join('/');
   const body = await req.text();
   const res = await fetch(`${API_BASE}/${path}`, {
     method: 'POST',

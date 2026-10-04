@@ -48,19 +48,19 @@ export function ReviewDetailDrawer({
   if (!taskId) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/30" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex justify-end bg-ink/30" onClick={onClose}>
       <aside
-        className="h-full w-full max-w-xl overflow-y-auto bg-white p-6 shadow-xl"
+        className="h-full w-full max-w-xl overflow-y-auto border-l border-border bg-surface p-6 shadow-card"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-display text-xl font-semibold">审查详情</h2>
-          <button onClick={onClose} className="text-sm text-slate-500">
+          <h2 className="text-xl font-semibold text-ink">审查详情</h2>
+          <button onClick={onClose} className="ui-btn-secondary">
             关闭
           </button>
         </div>
         {!detail ? (
-          <p className="text-sm text-slate-400">加载中…</p>
+          <p className="text-sm text-ink-muted">加载中…</p>
         ) : (
           <div className="space-y-4 text-sm">
             <p>
@@ -72,7 +72,7 @@ export function ReviewDetailDrawer({
               ) : null}
             </p>
             {detail.record?.finalMarkdown ? (
-              <div className="prose prose-sm max-w-none rounded-md bg-slate-50 p-4">
+              <div className="prose prose-sm max-w-none rounded-control border border-border bg-paper p-4">
                 <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
                   {detail.record.finalMarkdown}
                 </ReactMarkdown>
@@ -80,13 +80,13 @@ export function ReviewDetailDrawer({
             ) : null}
             <ul className="space-y-2">
               {(detail.record?.issues ?? []).map((i) => (
-                <li key={i.id} className="rounded-md border border-slate-100 p-3">
+                <li key={i.id} className="rounded-control border border-border p-3">
                   <p className="font-medium">
                     [{i.severity}/{i.category}] {i.filePath}:{i.line ?? '?'}
                   </p>
-                  <p className="mt-1 text-slate-600">{i.description}</p>
+                  <p className="mt-1 text-ink-muted">{i.description}</p>
                   {i.ruleTitle ? (
-                    <p className="mt-1 text-xs text-brand">规范: {i.ruleTitle}</p>
+                    <p className="mt-1 font-mono text-xs text-brand">规范: {i.ruleTitle}</p>
                   ) : null}
                 </li>
               ))}
