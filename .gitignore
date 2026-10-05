@@ -10,5 +10,5 @@ coverage
 apps/server/prisma/*.db
 uploads
 .pnpm-store
-tsconfig.tsbuildinfo
+*.tsbuildinfo
 __pycache__
